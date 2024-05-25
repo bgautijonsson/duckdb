@@ -4,10 +4,10 @@ for (i in 1:10) {
 }
 
 library(tictoc)
-library(duckdb)
 library(dplyr)
 library(arrow)
 library(data.table)
+library(duckplyr)
 
 arrow::open_csv_dataset("out.csv") |> 
   arrow::write_parquet("out.parquet")
@@ -15,7 +15,6 @@ arrow::open_csv_dataset("out.csv") |>
 
 
 # dplyr -------------------------------------------------------------------
-
 d <- arrow::read_parquet("out.parquet")
 tic()
 d |> 
@@ -43,6 +42,20 @@ arrow_time <- toc()
 rm(d)
 
 
+# duckplyr ----------------------------------------------------------------
+d <- arrow::read_parquet("out.parquet") |> 
+  as_duckplyr_df()
+
+tic()
+d |> 
+  summarise(
+    mean = mean(Sepal.Length),
+    n = n(),
+    .by = Species
+  ) 
+duckplyr_time <- toc()
+rm(d)
+
 
 # data.table --------------------------------------------------------------
 d <- fread("out.csv")
@@ -52,6 +65,10 @@ d[, .(mean = mean(Sepal.Length),n = length(Sepal.Length)), .(Species)]
 datatable_time <- toc()
 rm(d)
 
+
+
+# Results -----------------------------------------------------------------
 dplyr_time$callback_msg
 arrow_time$callback_msg
+duckplyr_time$callback_msg
 datatable_time$callback_msg
