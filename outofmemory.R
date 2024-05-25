@@ -10,6 +10,8 @@ library(duckdb)
 library(dplyr)
 library(arrow)
 
+
+# duckdb csv --------------------------------------------------------------
 tic()
 con <- dbConnect(duckdb())
 tbl(con, "out.csv") |> 
@@ -22,6 +24,9 @@ tbl(con, "out.csv") |>
 dbDisconnect(con)
 duckdb_time <- toc()
 
+
+
+# Reading in CSV and dplyr ------------------------------------------------
 tic()
 d <- data.table::fread("out.csv")
 
@@ -33,16 +38,8 @@ d |>
   )
 inmemory_time <- toc()
 
-tic()
-read_parquet("out.parquet", as_data_frame = FALSE) |> 
-  group_by(Species) |> 
-  summarise(
-    mean = mean(Sepal.Length),
-    n = n()
-  ) |> 
-  collect()
-arrow_inmemory_time <- toc()
 
+# Arrow on parquet --------------------------------------------------------
 tic()
 open_dataset("out.parquet") |> 
   group_by(Species) |> 
@@ -56,7 +53,6 @@ parquet_time <- toc()
 duckdb_time$callback_msg
 inmemory_time$callback_msg
 parquet_time$callback_msg
-arrow_inmemory_time$callback_msg
 lobstr::obj_size(d)
 
 

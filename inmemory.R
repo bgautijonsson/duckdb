@@ -12,8 +12,11 @@ library(data.table)
 arrow::open_csv_dataset("out.csv") |> 
   arrow::write_parquet("out.parquet")
 
-d <- arrow::read_parquet("out.parquet")
 
+
+# dplyr -------------------------------------------------------------------
+
+d <- arrow::read_parquet("out.parquet")
 tic()
 d |> 
   dplyr::group_by(Species) |> 
@@ -24,6 +27,8 @@ d |>
 dplyr_time <- toc()
 rm(d)
 
+
+# arrow -------------------------------------------------------------------
 d <- arrow::read_parquet("out.parquet", as_data_frame = FALSE)
 
 tic()
@@ -37,10 +42,13 @@ d |>
 arrow_time <- toc()
 rm(d)
 
+
+
+# data.table --------------------------------------------------------------
 d <- fread("out.csv")
 
 tic()
-d[, .(mean=mean(Sepal.Length),n=length(Sepal.Length)), .(Species)]
+d[, .(mean = mean(Sepal.Length),n = length(Sepal.Length)), .(Species)]
 datatable_time <- toc()
 rm(d)
 
