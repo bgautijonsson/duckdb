@@ -23,10 +23,7 @@ tbl(con, "out.csv") |>
   collect()
 dbDisconnect(con)
 duckdb_csv_time <- toc()
-
-
 # duckdb parquet ----------------------------------------------------------
-
 tic()
 con <- dbConnect(duckdb())
 tbl(con, "out.parquet") |> 
@@ -38,13 +35,9 @@ tbl(con, "out.parquet") |>
   collect()
 dbDisconnect(con)
 duckdb_parquet_time <- toc()
-
-
 # arrow csv ---------------------------------------------------------------
-
 tic()
 open_csv_dataset("out.csv") |> 
-  to_duckdb() |> 
   group_by(Species) |> 
   summarise(
     mean = mean(Sepal.Length),
@@ -52,7 +45,6 @@ open_csv_dataset("out.csv") |>
   ) |> 
   collect()
 arrow_csv_time <- toc()
-
 # Arrow on parquet --------------------------------------------------------
 tic()
 open_dataset("out.parquet") |> 

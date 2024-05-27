@@ -6,3 +6,4 @@
 .quarto
 out.csv
 out.parquet
+small_out.csv
