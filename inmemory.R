@@ -1,5 +1,5 @@
 data.table::fwrite(data.table::rbindlist(rep(list(iris), 100000)), "out.csv")
-for (i in 1:10) {
+for (i in 1:2) {
   data.table::fwrite(data.table::rbindlist(rep(list(iris), 100000)), "out.csv", append = TRUE)
 }
 
@@ -43,6 +43,7 @@ rm(d)
 
 
 # duckplyr ----------------------------------------------------------------
+duckplyr::methods_overwrite()
 d <- arrow::read_parquet("out.parquet") |> 
   as_duckplyr_df()
 
@@ -55,6 +56,7 @@ d |>
   ) 
 duckplyr_time <- toc()
 rm(d)
+duckplyr::methods_restore()
 
 
 # data.table --------------------------------------------------------------
